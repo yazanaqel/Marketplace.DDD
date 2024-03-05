@@ -27,6 +27,7 @@ builder.Services.AddAuthentication(options => {
         ValidAudience = builder.Configuration["HelperJWT:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["HelperJWT:Key"]))
     };
+
 });
 
 builder.Services.AddControllers();
