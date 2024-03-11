@@ -15,7 +15,7 @@ public class UserController(IMediator mediator) : ControllerBase {
 
         var result = await _mediator.Send(new RegisterUserCommand(dto));
 
-        return Ok(result);
+        return result.Success ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("Login")]

@@ -1,5 +1,4 @@
-﻿using Azure;
-using Domain;
+﻿using Domain;
 using Domain.Constants;
 using Domain.Domain.Users;
 using Infrastructure.SqlServerDb.Infrastructure;
@@ -11,13 +10,13 @@ using System.Security.Claims;
 using System.Text;
 
 namespace Infrastructure.SqlServer.Repositories;
-internal class UserRepository(UserManager<ApplicationUser> userManager, IOptions<HelperJWT> helperJWT) : IUserRepository {
+internal class UserService(UserManager<ApplicationUser> userManager, IOptions<HelperJWT> helperJWT) : IUserService {
 
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly HelperJWT _helperJWT = helperJWT.Value;
-    public async Task<DomainResponse<string>> LoginAsync(ApplicationUser user) {
+    public async Task<ApplicationResponse<string>> LoginAsync(ApplicationUser user) {
 
-        var response = new DomainResponse<string>();
+        var response = new ApplicationResponse<string>();
 
         try {
 
@@ -41,9 +40,9 @@ internal class UserRepository(UserManager<ApplicationUser> userManager, IOptions
         response.Success = true;
         return response;
     }
-    public async Task<DomainResponse<string>> RegisterAsync(ApplicationUser user) {
+    public async Task<ApplicationResponse<string>> RegisterAsync(ApplicationUser user) {
 
-        var response = new DomainResponse<string>();
+        var response = new ApplicationResponse<string>();
 
         try {
 

@@ -15,6 +15,7 @@ public static class CustomConstants {
     }
     public static class Operation {
         public static string Successful = "Successful Operation";
+        public static string Faild = "Faild Operation";
     }
     public static class User {
         public static string UserCreated = "User Created Successfuly";

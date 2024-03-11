@@ -1,12 +1,13 @@
-﻿namespace Infrastructure.SqlServer.Configuration;
-//public sealed class UserConfiguration : EntityTypeConfiguration<User> {
+﻿using Domain.Domain.Users;
+using Microsoft.EntityFrameworkCore;
 
-//    public override void Configure(EntityTypeBuilder<User> builder) {
+namespace Infrastructure.SqlServer.Configuration;
+internal sealed class UserConfiguration {
 
-//        builder.ToTable(nameof(User));
+    internal static void ConfigureApplicationUser(ModelBuilder modelBuilder) {
 
-//        builder.HasKey(userId => userId.Id);
-
-//        base.Configure(builder);
-//    }
-//}
+        modelBuilder.Entity<ApplicationUser>()
+            .HasKey(k => k.Id)
+            .IsClustered(false);
+    }
+}

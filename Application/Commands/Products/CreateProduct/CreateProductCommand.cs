@@ -1,33 +1,37 @@
 ﻿using Application.Application.Extensions;
 using Application.Dtos.ProductDtos;
+using AutoMapper;
 using Domain;
+using Domain.Constants;
 using Domain.Domain.Products;
+using Domain.Entities.Products;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 
 namespace Application.Commands.Products.CreateProduct;
 public record CreateProductCommand(CreateProductDto Dto) : BaseRequest, ICommand<ApplicationResponse<ProductResponseDto>>;
 
-public class CreateProductHandler(IProductRepository productRepository) : IRequestHandler<CreateProductCommand, ApplicationResponse<ProductResponseDto>> {
-    private readonly IProductRepository _productRepository = productRepository;
+public class CreateProductHandler(IProductService productRepository, IMapper mapper) : IRequestHandler<CreateProductCommand, ApplicationResponse<ProductResponseDto>> {
+    private readonly IProductService _productRepository = productRepository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<ApplicationResponse<ProductResponseDto>> Handle(CreateProductCommand request, CancellationToken cancellationToken) {
 
         var response = new ApplicationResponse<ProductResponseDto>();
 
-        var product = new Product(
+        var product = Product.CreateProduct(
             request.Dto.ProductName,
-            null,
-            request.Dto.Price,
+            new Money(request.Dto.Currency, request.Dto.Amount),
             request.Dto.Description,
-            request.UserId);
+            request.UserId,
+            request.Dto.Images);
 
         var result = await _productRepository.CreateProduct(product);
 
         if (result is { Success: true, Data: not null }) {
 
-            response.Data = new ProductResponseDto {ProductName=result.Data.ProductName  };
-            response.StatusCode = StatusCodes.Status201Created;
+            response.Data = _mapper.Map<ProductResponseDto>(result.Data);
+            response.Message = CustomConstants.Operation.Successful;
+
             return response;
         }
 

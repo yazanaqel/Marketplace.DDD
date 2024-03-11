@@ -1,20 +1,20 @@
 ﻿using Application.Dtos.UserDtos;
 using Domain;
+using Domain.Constants;
 using Domain.Domain.Users;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 
 namespace Application.Commands.Users.CreateUser;
 public record RegisterUserCommand(RegisterUserDto Dto) : ICommand<ApplicationResponse<UserResponseDto>>;
-public class RegisterUserHandler(IUserRepository userRepository) : IRequestHandler<RegisterUserCommand, ApplicationResponse<UserResponseDto>> {
+public class RegisterUserHandler(IUserService userRepository) : IRequestHandler<RegisterUserCommand, ApplicationResponse<UserResponseDto>> {
 
-    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IUserService _userRepository = userRepository;
 
     public async Task<ApplicationResponse<UserResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken) {
 
         var response = new ApplicationResponse<UserResponseDto>();
 
-        var user = new ApplicationUser(
+        var user = ApplicationUser.CreateUser(
             request.Dto.FirstName,
             request.Dto.LastName!,
             request.Dto.Email,
@@ -26,7 +26,7 @@ public class RegisterUserHandler(IUserRepository userRepository) : IRequestHandl
         if (result is { Success: true, Data: not null }) {
 
             response.Data = new UserResponseDto { JWT = result.Data };
-            response.StatusCode = StatusCodes.Status201Created;
+            response.Message = CustomConstants.Operation.Successful;
             return response;
         }
 

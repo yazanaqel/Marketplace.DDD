@@ -14,6 +14,8 @@ public static class DependencyInjection {
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UserIdBehavior<,>));
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 
+        services.AddAutoMapper(AssemblyProvider.GetAssembly());
+
         return services;
     }
 }

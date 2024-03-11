@@ -1,26 +1,29 @@
 ﻿using Application.Application.Abstractions;
 using Domain.Domain.Products;
 using Domain.Domain.Users;
+using Domain.Entities.Images;
+using Infrastructure.SqlServer.Configuration;
+using Infrastructure.SqlServerDb.Configuration;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace Infrastructure.SqlServer;
 
 public class MarketplaceDbContext : IdentityDbContext<ApplicationUser>, IDbContext, IUnitOfWork {
+
     public MarketplaceDbContext(DbContextOptions<MarketplaceDbContext> options) : base(options) {
 
-        
+
     }
-    public DbSet<ApplicationUser> ApplicationUser { get; set; }
-    public DbSet<Product> Products { get; set; }
+    public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
+    public virtual DbSet<Product> Products { get; set; }
+    public virtual DbSet<ProductImage> ProductImages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
 
-        modelBuilder.Entity<Product>()
-            .HasOne<ApplicationUser>()
-            .WithMany()
-            .HasForeignKey(p => p.UserId);
+        UserConfiguration.ConfigureApplicationUser(modelBuilder);
+        ProductConfiguration.ConfigureProduct(modelBuilder);
+        ProductImageConfiguration.ConfigureProductImages(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
     }

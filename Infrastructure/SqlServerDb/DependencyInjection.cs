@@ -33,8 +33,8 @@ public static class DependencyInjection {
 
         services.AddScoped<IDbContext>(factory => factory.GetRequiredService<MarketplaceDbContext>());
         services.AddScoped<IUnitOfWork>(factory => factory.GetRequiredService<MarketplaceDbContext>());
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IProductService, ProductService>();
 
         return services;
     }
