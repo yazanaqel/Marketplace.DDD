@@ -15,8 +15,8 @@ namespace Application.Queries.Products.GetProductDetails;
 public record GetProductDetailsQuery(ProductId ProductId)
     : IRequest<ApplicationResponse<ProductResponseDto>>;
 
-public class GetProductDetailsHandler(IDistributedCache cache, IDbContext dbContext, IMapper mapper) : IRequestHandler<GetProductDetailsQuery, ApplicationResponse<ProductResponseDto>> {
-    private readonly IDistributedCache _cache = cache;
+public class GetProductDetailsHandler(IDbContext dbContext, IMapper mapper) : IRequestHandler<GetProductDetailsQuery, ApplicationResponse<ProductResponseDto>> {
+
     private readonly IDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
@@ -24,18 +24,6 @@ public class GetProductDetailsHandler(IDistributedCache cache, IDbContext dbCont
 
         var response = new ApplicationResponse<ProductResponseDto>();
 
-        string recordKey = "product" + DateTime.Now.ToString("yyyyMMdd_hhmm");
-
-        var cache = await _cache.GetRecordAsync<ApplicationResponse<ProductResponseDto>>(recordKey);
-
-        if (cache is not null) {
-
-            response.Message = cache.Message;
-            response.Success = cache.Success;
-            response.PageInfo = cache.PageInfo;
-            response.Data = _mapper.Map<ProductResponseDto>(cache.Data);
-            return response;
-        }
 
         var result = await GetProductDetails(request.ProductId);
 
@@ -47,7 +35,6 @@ public class GetProductDetailsHandler(IDistributedCache cache, IDbContext dbCont
             response.PageInfo = result.PageInfo;
             response.Data = _mapper.Map<ProductResponseDto>(result.Data);
 
-            await _cache.SetRecordAsync(recordKey, response);
             return response;
         }
 

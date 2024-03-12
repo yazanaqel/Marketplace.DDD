@@ -1,4 +1,5 @@
 ﻿using Application.Application.Abstractions;
+using Application.Application.Extensions;
 using Application.Dtos.ProductDtos;
 using AutoMapper;
 using Domain;
@@ -6,13 +7,15 @@ using Domain.Constants;
 using Domain.Domain.Products;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using System.Linq.Expressions;
 
 namespace Application.Queries.Products.GetAllProducts;
 public record GetAllProductsQuery(string? sortColumn, string? sortOrder, string? searchItem, int page, int pageSize)
     : IRequest<ApplicationResponse<IReadOnlyList<ProductsResponseDto>>>;
-public class GetAllProductsHandler(IDbContext dbContext, IMapper mapper)
+public class GetAllProductsHandler(IDistributedCache cache, IDbContext dbContext, IMapper mapper)
     : IRequestHandler<GetAllProductsQuery, ApplicationResponse<IReadOnlyList<ProductsResponseDto>>> {
+    private readonly IDistributedCache _cache = cache;
     private readonly IDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
@@ -42,11 +45,18 @@ public class GetAllProductsHandler(IDbContext dbContext, IMapper mapper)
 
     private async Task<ApplicationResponse<IReadOnlyList<Product>>> GetAllProducts(string? sortColumn, string? sortOrder, string? searchItem, int page, int pageSize) {
 
-        ApplicationResponse<IReadOnlyList<Product>> response = new();
+        var response = new ApplicationResponse<IReadOnlyList<Product>>();
+
+        string recordKey = "products" + DateTime.Now.ToString("yyyyMMdd_hhmm");
 
         try {
 
-            IQueryable<Product> productsQuery = _dbContext.Products.AsNoTracking();
+            IQueryable<Product> productsQuery = await _cache.GetRecordAsync<IQueryable<Product>>(recordKey);
+
+            if (productsQuery is null) {
+
+                productsQuery = _dbContext.Products.AsNoTracking();
+            }
 
             if (!productsQuery.Any()) {
 
@@ -54,6 +64,8 @@ public class GetAllProductsHandler(IDbContext dbContext, IMapper mapper)
                 response.Success = true;
                 return response;
             }
+
+            await _cache.SetRecordAsync(recordKey, productsQuery);
 
             if (!string.IsNullOrWhiteSpace(searchItem)) {
                 productsQuery = productsQuery.Where(p => p.ProductName.Contains(searchItem) || p.Description.Contains(searchItem));
