@@ -5,14 +5,14 @@ using Domain;
 using Domain.Constants;
 using Domain.Domain.Products;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Application.Queries.Products.GetAllProducts;
 public record GetAllProductsQuery(string? sortColumn, string? sortOrder, string? searchItem, int page, int pageSize)
     : IRequest<ApplicationResponse<IReadOnlyList<ProductsResponseDto>>>;
-public class GetAllProductsHandler(IDbContext dbContext, IMapper mapper) : IRequestHandler<GetAllProductsQuery, ApplicationResponse<IReadOnlyList<ProductsResponseDto>>> {
+public class GetAllProductsHandler(IDbContext dbContext, IMapper mapper)
+    : IRequestHandler<GetAllProductsQuery, ApplicationResponse<IReadOnlyList<ProductsResponseDto>>> {
     private readonly IDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 

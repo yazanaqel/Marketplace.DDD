@@ -10,11 +10,13 @@ using MediatR;
 namespace Application.Commands.Products.CreateProduct;
 public record CreateProductCommand(CreateProductDto Dto) : BaseRequest, ICommand<ApplicationResponse<ProductResponseDto>>;
 
-public class CreateProductHandler(IProductService productRepository, IMapper mapper) : IRequestHandler<CreateProductCommand, ApplicationResponse<ProductResponseDto>> {
+public class CreateProductHandler(IProductService productRepository, IMapper mapper)
+    : IRequestHandler<CreateProductCommand, ApplicationResponse<ProductResponseDto>> {
     private readonly IProductService _productRepository = productRepository;
     private readonly IMapper _mapper = mapper;
 
-    public async Task<ApplicationResponse<ProductResponseDto>> Handle(CreateProductCommand request, CancellationToken cancellationToken) {
+    public async Task<ApplicationResponse<ProductResponseDto>> Handle(
+        CreateProductCommand request, CancellationToken cancellationToken) {
 
         var response = new ApplicationResponse<ProductResponseDto>();
 

@@ -1,17 +1,15 @@
 ﻿using Application.Application.Abstractions;
 using Domain.Domain.Products;
 using Domain.Domain.Users;
+using Infrastructure.SqlServer;
 using Infrastructure.SqlServer.Repositories;
 using Infrastructure.SqlServerDb.Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
-namespace Infrastructure.SqlServer;
+namespace Infrastructure;
 public static class DependencyInjection {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) {
 
@@ -19,8 +17,13 @@ public static class DependencyInjection {
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
         });
 
-        services.AddIdentity<ApplicationUser, IdentityRole>(op =>
-        {
+        services.AddStackExchangeRedisCache(options => {
+            options.Configuration = configuration.GetConnectionString("Redis");
+            options.InstanceName = "RedisCache_";
+        });
+
+
+        services.AddIdentity<ApplicationUser, IdentityRole>(op => {
             op.Password.RequireDigit = false;
             op.Password.RequiredLength = 6;
             op.Password.RequireUppercase = false;

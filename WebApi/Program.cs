@@ -1,9 +1,9 @@
-using Infrastructure.SqlServer;
 using Application;
 using Infrastructure.SqlServerDb.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

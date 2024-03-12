@@ -16,6 +16,7 @@ public static class DependencyInjection {
 
         services.AddAutoMapper(AssemblyProvider.GetAssembly());
 
+
         return services;
     }
 }
